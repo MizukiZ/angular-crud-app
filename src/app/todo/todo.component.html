@@ -21,11 +21,12 @@
             [checked]="todo.isDone"
             (click)="statusToggle(todo, $event)"
           />
-          <label>{{ todo.title }}</label>
+          <label (dblclick)="todo.editing = true">{{ todo.title }}</label>
           <button class="destroy" (click)="destroyTodo(todo)"></button>
         </div>
         <input
-          class="edit"
+          *ngIf="todo.editing"
+          class="editing"
           #updatedTodo
           [value]="todo.title"
           (blur)="updateTodo(todo, updatedTodo.value)"
