@@ -19,44 +19,45 @@ export class TodoComponent implements OnInit {
   ) {}
 
   getTodos(query = "") {
-    return this.todoService.get(query).then(todos => {
+    return this.todoService.get(query).subscribe(todos => {
       console.log(`Current todo objects ${JSON.stringify(todos)}`)
       this.todos = todos
-      this.activeTasks = this.todos.filter(todo => todo.isDone).length
+      this.activeTasks = this.todos.filter(todo => !todo.isDone).length
     })
   }
 
   addTodo() {
-    this.todoService.add({ title: this.newTodo, isDone: false }).then(() => {
-      this.getTodos(this.path).then(() => {
+    this.todoService
+      .add({ title: this.newTodo, isDone: false })
+      .subscribe(() => {
+        this.getTodos(this.path)
         this.newTodo = ""
       })
-    })
   }
 
   statusToggle(todo, e) {
     status = e.target.checked
-    this.todoService.toggleStatus(todo, status).then(() => {
+    this.todoService.toggleStatus(todo, status).subscribe(() => {
       this.getTodos(this.path)
     })
   }
 
   updateTodo(todo, newValue) {
     todo.title = newValue
-    return this.todoService.put(todo).then(() => {
+    return this.todoService.put(todo).subscribe(() => {
       todo.editing = false
       return this.getTodos(this.path)
     })
   }
 
   destroyTodo(todo) {
-    this.todoService.destroy(todo).then(() => {
+    this.todoService.destroy(todo).subscribe(() => {
       this.getTodos(this.path)
     })
   }
 
   clearCompleted() {
-    this.todoService.deleteCompleted().then(() => {
+    this.todoService.deleteCompleted().subscribe(() => {
       this.getTodos(this.path)
     })
   }

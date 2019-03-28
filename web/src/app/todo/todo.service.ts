@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core"
+import { HttpClient, HttpHeaders } from "@angular/common/http"
 
 let TODOS = [
   { title: "Install Angular CLI", isDone: true },
@@ -6,63 +7,46 @@ let TODOS = [
   { title: "Finish service functionality", isDone: false },
   { title: "Setup API", isDone: false }
 ]
+const apiUrl = "http://localhost:8000"
+const httpOptions = {
+  headers: new HttpHeaders({ "Content-Type": "application/json" })
+}
 
 @Injectable({
   providedIn: "root"
 })
 export class TodoService {
-  constructor() {}
+  constructor(private http: HttpClient) {
+    this.http.get(apiUrl + "/todos").subscribe(todos => {
+      console.log(todos)
+    })
+  }
 
   get(query) {
-    return new Promise(resolve => {
-      let data
-
-      if (query === "active" || query === "completed") {
-        const isCompleted = query === "completed"
-        data = TODOS.filter(todo => todo.isDone == isCompleted)
-      } else {
-        data = TODOS
-      }
-      resolve(data)
-    })
+    return this.http.get(`${apiUrl}/todos?status=${query}`)
   }
 
   add(data) {
-    return new Promise(resolve => {
-      TODOS.push(data)
-      resolve(data)
-    })
+    return this.http.post(`${apiUrl}/todos`, data, httpOptions)
   }
 
   put(changed) {
-    return new Promise(resolve => {
-      const index = TODOS.findIndex(todo => todo === changed)
-      TODOS[index].title = changed.title
-      resolve(changed)
-    })
+    return this.http.put(`${apiUrl}/todo/${changed._id}/`, changed, httpOptions)
   }
 
   destroy(destroyed) {
-    return new Promise(resolve => {
-      const index = TODOS.findIndex(todo => todo === destroyed)
-      TODOS.splice(index, 1)
-      resolve(true)
-    })
+    return this.http.delete(`${apiUrl}/todo/${destroyed._id}/`)
   }
 
   toggleStatus(toggled, status) {
-    return new Promise(resolve => {
-      const index = TODOS.findIndex(todo => todo === toggled)
-      const boolStatus = status === "true" ? true : false
-      TODOS[index].isDone = boolStatus
-      resolve(toggled)
-    })
+    return this.http.put(
+      `${apiUrl}/todo/${toggled._id}/`,
+      { isDone: status },
+      httpOptions
+    )
   }
 
   deleteCompleted() {
-    return new Promise(resolve => {
-      TODOS = TODOS.filter(todo => !todo.isDone)
-      resolve(TODOS)
-    })
+    return this.http.delete(`${apiUrl}/todos`)
   }
 }
