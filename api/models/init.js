@@ -8,7 +8,7 @@ mongoose
   .then(() => {
     console.log("Successfully connected to database")
   })
-  .catch(() => {
+  .catch(error => {
     console.error("Error connecting to MongoDB database", error)
   })
 
